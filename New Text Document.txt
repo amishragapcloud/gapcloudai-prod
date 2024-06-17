@@ -1,0 +1,48 @@
+server = 'in-sqlsrvr-prod.database.windows.net'
+database = 'IN-SQLDB-NZ-WRC-01sep2023-PROD'
+port = 1433
+driver = 'ODBC Driver 17 for SQL Server'
+
+# For Azure SQL Server using Active Directory Authentication:
+params = quote_plus(
+    f"DRIVER={{{driver}}};"
+    f"SERVER=tcp:{server},{port};"
+    f"DATABASE={database};"
+    f"Encrypt=True;"
+    f"TrustServerCertificate=False;"
+    f"Connection Timeout=30;"
+    f"Authentication=Active Directory Default;"
+)
+
+DATABASE_URI = f"mssql+pyodbc:///?odbc_connect={params}"
+
+engine = create_engine(DATABASE_URI)
+
+alerts_config = [
+    {"table": "production_data", "field": "temperature", "threshold": 20},
+    {"table": "production_data", "field": "pressure", "threshold": 30},
+    # Add more alerts as needed
+]
+
+def fetch_data(table, field):
+    """Fetch data from the database."""
+    query = f"SELECT {field} FROM {table}"
+    data = pd.read_sql(query, engine)
+    return data
+
+def check_alerts():
+    """Check each alert configuration against database values."""
+    for alert in alerts_config:
+        data = fetch_data(alert['table'], alert['field'])
+        if data[alert['field']].min() < alert['threshold']:
+            print(f"Alert: {alert['field']} in {alert['table']} is below the threshold {alert['threshold']}")
+
+# Running the alert checking function
+check_alerts()
+
+try:
+    with engine.connect() as connection:
+        print("Database connection successful!")
+except Exception as e:
+    print(f"Failed to connect to database: {e}")
+

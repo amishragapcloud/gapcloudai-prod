@@ -1,0 +1,12 @@
+numpy
+pandas
+streamlit
+openai==0.28
+python-dotenv
+pyodbc
+matplotlib
+plotly
+dash
+SQLAlchemy
+hydralit_components
+streamlit-lottie
