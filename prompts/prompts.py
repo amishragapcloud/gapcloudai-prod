@@ -11,6 +11,8 @@ Talk Time is calculated from Call Detail Table.Total Duration of call,Handling t
 
 To calculate Queue Time, Consider Call detail table only.
 
+Calculate all times in HH:MM:SS as a mandatory process.
+
 Here is the schema of the table:
 {schema}
 
